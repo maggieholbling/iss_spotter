@@ -26,8 +26,10 @@ const fetchMyIP = function(callback) {
   });
 };
 
+
+
 const fetchCoordsByIP = function(ipString, callback) {
-  request(`https://ipvigilante.com/${ipString}`, (error, response, body) => {
+  request(`http://ip-api.com/json/${ipString}`, (error, response, body) => {
 
     if (error) return callback(error, null);
 
@@ -38,8 +40,8 @@ const fetchCoordsByIP = function(ipString, callback) {
     }
 
     const data = {
-      "latitude": JSON.parse(body)["data"]["latitude"],
-      "longitude": JSON.parse(body)["data"]["longitude"]
+      "latitude": JSON.parse(body)["lat"],
+      "longitude": JSON.parse(body)["lon"]
     };
 
     callback(null, data);
@@ -62,4 +64,19 @@ const fetchISSFlyOverTimes = function(coords, callback) {
   });
 };
 
-module.exports = { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes };
+const nextISSTimesForMyLocation = function(callback) {
+  fetchMyIP((err, ipString) => {
+    if (err) return callback(err, null);
+
+    fetchCoordsByIP(ipString, (err, geoCoordinates) => {
+      if (err) return callback(err, null);
+      
+      fetchISSFlyOverTimes(geoCoordinates, (err, data) => {
+        if (err) return callback(err, null);
+        callback(null, data);
+      });
+    });
+  });
+};
+
+module.exports = { nextISSTimesForMyLocation };

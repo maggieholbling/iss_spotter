@@ -1,16 +1,16 @@
-const { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes } = require('./src/iss.js');
+const { nextISSTimesForMyLocation } = require('./src/iss.js');
 
-// fetchMyIP((err, ipString) => {
-//   if (err) return console.log(`Error IP-fetch details: ${err}`);
-//   if (ipString) return console.log(ipString);
-// });
-
-// fetchCoordsByIP("162.245.144.188", (err, geoCoordinates) => {
-//   if (err) return console.log(`Something went wrong: ${err}`);
-//   if (geoCoordinates) return console.log(geoCoordinates);
-// });
-
-fetchISSFlyOverTimes({ latitude: '49.26200', longitude: '-123.09230' }, (err, data) => {
+nextISSTimesForMyLocation((err, data) => {
   if (err) return console.log(`Something went wrong: ${err}`);
-  if (data) return console.log(data);
+  if (data) return printPasses(data);
 });
+
+//LHL code for deciphering the date and time
+const printPasses = function(issPasses) {
+  for (const pass of issPasses) {
+    const datetime = new Date(0);
+    datetime.setUTCSeconds(pass.risetime);
+    const duration = pass.duration;
+    console.log(`Next pass at ${datetime} for ${duration} seconds!`);
+  }
+};
